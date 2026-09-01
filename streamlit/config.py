@@ -6,4 +6,4 @@ API_BASE_URL = os.getenv(
     "http://localhost:8000"
 )
 
-REQUEST_TIMEOUT = 10
+REQUEST_TIMEOUT = 30
