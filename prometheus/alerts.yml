@@ -1,0 +1,136 @@
+groups:
+  - name: revenue-reliability
+    rules:
+
+      # =========================================================
+      # 1. HIGH REVENUE AT RISK
+      # =========================================================
+      - alert: HighRevenueAtRisk
+        expr: revenue_at_risk > 1000000
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High revenue is currently at risk"
+          description: "Revenue at risk has exceeded ₹10,00,000 for more than 5 minutes."
+
+      # =========================================================
+      # 2. CRITICAL REVENUE AT RISK
+      # =========================================================
+      - alert: CriticalRevenueAtRisk
+        expr: revenue_at_risk > 1500000
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Critical revenue exposure detected"
+          description: "Revenue at risk has exceeded ₹15,00,000 for more than 2 minutes."
+
+      # =========================================================
+      # 3. LOW RECOVERY SUCCESS RATE
+      # =========================================================
+      - alert: LowRecoverySuccessRate
+        expr: |
+          (
+            increase(recovery_success_total[15m])
+            /
+            clamp_min(increase(recovery_attempts_total[15m]), 1)
+          ) < 0.30
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Recovery success rate is low"
+          description: "Less than 30% of recovery attempts have succeeded over the last 15 minutes."
+
+      # =========================================================
+      # 4. CIRCUIT BREAKER OPEN
+      # =========================================================
+      - alert: RecoveryCircuitBreakerOpen
+        expr: circuit_breaker_state == 1
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Recovery circuit breaker is OPEN"
+          description: "Recovery execution has been stopped because provider failures exceeded the safety threshold."
+
+      # =========================================================
+      # 5. EXCESSIVE GUARDRAIL BLOCKS
+      # =========================================================
+      - alert: ExcessiveGuardrailBlocks
+        expr: increase(guardrail_blocks_total[15m]) >= 5
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Recovery guardrails are blocking many actions"
+          description: "Five or more recovery actions have been blocked during the last 15 minutes."
+
+      # =========================================================
+      # 6. HIGH RECOVERY LATENCY
+      # =========================================================
+      - alert: HighRecoveryLatency
+        expr: |
+          (
+            rate(recovery_latency_sum[5m])
+            /
+            clamp_min(rate(recovery_latency_count[5m]), 0.001)
+          ) > 1
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Recovery execution latency is high"
+          description: "Average recovery execution latency has exceeded 1 second for 5 minutes."
+
+      # =========================================================
+      # 7. NO RECOVERY ACTIVITY
+      # =========================================================
+      - alert: RecoveryPipelineInactive
+        expr: increase(recovery_attempts_total[15m]) == 0
+        for: 15m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Recovery pipeline appears inactive"
+          description: "No recovery attempts have been recorded during the last 15 minutes."
+
+      # =========================================================
+      # 8. RECOVERY FAILURE SPIKE
+      # =========================================================
+      - alert: RecoveryFailureSpike
+        expr: increase(recovery_failed_total[15m]) >= 5
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Recovery failures are increasing"
+          description: "At least five recovery attempts have failed during the last 15 minutes."
+
+      # =========================================================
+      # 9. RECOVERY STALLED
+      # =========================================================
+      - alert: RevenueRecoveryStalled
+        expr: |
+          revenue_at_risk > 1000000
+          and
+          increase(recovery_success_total[30m]) == 0
+        for: 10m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Revenue recovery appears stalled"
+          description: "More than ₹10,00,000 remains at risk while no successful recovery has been recorded for 30 minutes."
+
+      # =========================================================
+      # 10. HIGH HUMAN ESCALATION VOLUME
+      # =========================================================
+      - alert: HighHumanEscalationVolume
+        expr: ai_decisions_total{action="ESCALATE"} > 20
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High volume of AI escalations"
+          description: "More than 20 recovery cases are currently being routed to human review."

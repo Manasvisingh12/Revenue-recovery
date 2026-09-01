@@ -1,0 +1,27 @@
+# Environment variables and secrets
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+
+# Virtual environments
+.venv/
+venv/
+
+# Streamlit secrets
+.streamlit/secrets.toml
+
+# macOS
+.DS_Store
+# Local backup files
+*.backup
+*.backup2
+
+# Local Streamlit experiments
+streamlit/dedent_test.py
+streamlit/render_test.py
+streamlit/test_render.py
+streamlit/test_ui.py
