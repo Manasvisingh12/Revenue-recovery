@@ -19,15 +19,19 @@ from app.recovery.recovery_metrics import (
     recovery_latency,
 )
 
+from app.recovery.outcome_tracker import (
+    track_recovery_outcome,
+)
+
+from app.recovery.message_executor import (
+    execute_recovery_message,
+)
+
 
 def execute_recovery_action(
     db: Session,
     case: RecoveryCase,
 ) -> dict:
-
-    # ============================================================
-    # START LATENCY TIMER
-    # ============================================================
 
     start_time = time.perf_counter()
 
@@ -38,57 +42,25 @@ def execute_recovery_action(
             or "NO_ACTION"
         )
 
-        # ========================================================
-        # NORMALIZE ACTION
-        # ========================================================
-
         action_map = {
-
-            "RETRY_CHECKOUT":
-                "RETRY",
-
-            "RETRY_WITH_ALTERNATE_ROUTE":
-                "RETRY",
-
-            "REQUEST_ALTERNATIVE_PAYMENT_METHOD":
-                "MESSAGE",
-
-            "REQUEST_CARD_UPDATE":
-                "MESSAGE",
-
-            "CUSTOMER_REVIEW":
-                "ESCALATE",
-
-            "AI_REVIEW":
-                "ESCALATE",
-
-            "RETRY":
-                "RETRY",
-
-            "WAIT":
-                "WAIT",
-
-            "MESSAGE":
-                "MESSAGE",
-
-            "ESCALATE":
-                "ESCALATE",
-
-            "NO_ACTION":
-                "NO_ACTION",
-
-            "STOP":
-                "STOP",
+            "RETRY_CHECKOUT": "RETRY",
+            "RETRY_WITH_ALTERNATE_ROUTE": "RETRY",
+            "REQUEST_ALTERNATIVE_PAYMENT_METHOD": "MESSAGE",
+            "REQUEST_CARD_UPDATE": "MESSAGE",
+            "CUSTOMER_REVIEW": "ESCALATE",
+            "AI_REVIEW": "ESCALATE",
+            "RETRY": "RETRY",
+            "WAIT": "WAIT",
+            "MESSAGE": "MESSAGE",
+            "ESCALATE": "ESCALATE",
+            "NO_ACTION": "NO_ACTION",
+            "STOP": "STOP",
         }
 
         action = action_map.get(
             requested_action,
             "STOP",
         )
-
-        # ========================================================
-        # RECORD AI DECISION
-        # ========================================================
 
         record_audit_event(
             db,
@@ -98,17 +70,14 @@ def execute_recovery_action(
             decision=action,
             reasoning=case.ai_diagnosis,
             metadata={
-                "requested_action":
-                    requested_action,
-
-                "normalized_action":
-                    action,
+                "requested_action": requested_action,
+                "normalized_action": action,
             },
         )
 
-        # ========================================================
+        # ====================================================
         # GUARDRAIL VALIDATION
-        # ========================================================
+        # ====================================================
 
         validation = validate_recovery_action(
             db,
@@ -131,10 +100,6 @@ def execute_recovery_action(
             False,
         )
 
-        # ========================================================
-        # RECORD GUARDRAIL EVALUATION
-        # ========================================================
-
         record_audit_event(
             db,
             case,
@@ -144,20 +109,15 @@ def execute_recovery_action(
             reasoning=reason,
             guardrail_result=validation,
             metadata={
-                "requested_action":
-                    action,
-
-                "final_action":
-                    final_action,
-
-                "allowed":
-                    allowed,
+                "requested_action": action,
+                "final_action": final_action,
+                "allowed": allowed,
             },
         )
 
-        # ========================================================
-        # BLOCKED ACTION
-        # ========================================================
+        # ====================================================
+        # BLOCKED BY GUARDRAILS
+        # ====================================================
 
         if not allowed:
 
@@ -181,6 +141,8 @@ def execute_recovery_action(
                 "escalated": False,
                 "action": final_action,
                 "reason": reason,
+                "status": "BLOCKED",
+                "recovered_amount": 0,
             }
 
             record_audit_event(
@@ -196,9 +158,9 @@ def execute_recovery_action(
 
             return execution_result
 
-        # ========================================================
-        # HUMAN ESCALATION
-        # ========================================================
+        # ====================================================
+        # ESCALATE
+        # ====================================================
 
         if final_action == "ESCALATE":
 
@@ -222,6 +184,8 @@ def execute_recovery_action(
                 "escalated": True,
                 "action": "ESCALATE",
                 "reason": reason,
+                "status": "ESCALATED",
+                "recovered_amount": 0,
             }
 
             record_audit_event(
@@ -237,9 +201,9 @@ def execute_recovery_action(
 
             return execution_result
 
-        # ========================================================
+        # ====================================================
         # NO ACTION
-        # ========================================================
+        # ====================================================
 
         if final_action == "NO_ACTION":
 
@@ -263,6 +227,8 @@ def execute_recovery_action(
                 "escalated": False,
                 "action": "NO_ACTION",
                 "reason": reason,
+                "status": "SKIPPED",
+                "recovered_amount": 0,
             }
 
             record_audit_event(
@@ -278,9 +244,9 @@ def execute_recovery_action(
 
             return execution_result
 
-        # ========================================================
+        # ====================================================
         # STOP
-        # ========================================================
+        # ====================================================
 
         if final_action == "STOP":
 
@@ -304,6 +270,8 @@ def execute_recovery_action(
                 "escalated": False,
                 "action": "STOP",
                 "reason": reason,
+                "status": "BLOCKED",
+                "recovered_amount": 0,
             }
 
             record_audit_event(
@@ -319,19 +287,22 @@ def execute_recovery_action(
 
             return execution_result
 
-        # ========================================================
-        # EXECUTE RETRY
-        # ========================================================
+        # ====================================================
+        # MESSAGE RECOVERY
+        # ====================================================
 
-        if final_action == "RETRY":
+        if final_action == "MESSAGE":
 
-            case.retry_count += 1
+            message_result = execute_recovery_message(
+                db,
+                case,
+            )
 
             log = RecoveryActionLog(
                 case_id=case.case_id,
                 merchant_id=case.merchant_id,
                 customer_id=case.customer_id,
-                action=final_action,
+                action="MESSAGE",
                 status="EXECUTED",
                 block_reason=None,
                 estimated_cost=0,
@@ -345,8 +316,17 @@ def execute_recovery_action(
                 "executed": True,
                 "blocked": False,
                 "escalated": False,
-                "action": final_action,
+                "action": "MESSAGE",
                 "reason": reason,
+                "status": "SENT",
+                "recovered_amount": 0,
+                "payment_link": message_result.get(
+                    "payment_link"
+                ),
+                "message": message_result.get(
+                    "message"
+                ),
+                "message_status": "SENT",
             }
 
             record_audit_event(
@@ -354,7 +334,7 @@ def execute_recovery_action(
                 case,
                 event_type="RECOVERY_EXECUTION",
                 event_source="ACTION_EXECUTOR",
-                decision=final_action,
+                decision="MESSAGE",
                 reasoning=reason,
                 guardrail_result=validation,
                 execution_result=execution_result,
@@ -362,9 +342,76 @@ def execute_recovery_action(
 
             return execution_result
 
-        # ========================================================
-        # UNKNOWN / UNSUPPORTED ACTION
-        # ========================================================
+        # ====================================================
+        # RETRY RECOVERY
+        # ====================================================
+
+        if final_action == "RETRY":
+
+            case.retry_count += 1
+
+            log = RecoveryActionLog(
+                case_id=case.case_id,
+                merchant_id=case.merchant_id,
+                customer_id=case.customer_id,
+                action="RETRY",
+                status="EXECUTED",
+                block_reason=None,
+                estimated_cost=0,
+            )
+
+            db.add(log)
+
+            # ------------------------------------------------
+            # Simulated successful payment recovery.
+            #
+            # This is a hackathon simulation, so an allowed
+            # retry represents the payment succeeding.
+            # ------------------------------------------------
+
+            execution_result = {
+                "executed": True,
+                "blocked": False,
+                "escalated": False,
+                "action": "RETRY",
+                "reason": reason,
+                "status": "SUCCESS",
+                "recovered_amount": case.amount,
+            }
+
+            outcome_result = track_recovery_outcome(
+                db,
+                case,
+                execution_result,
+            )
+
+            record_audit_event(
+                db,
+                case,
+                event_type="RECOVERY_EXECUTION",
+                event_source="ACTION_EXECUTOR",
+                decision="RETRY",
+                reasoning=reason,
+                guardrail_result=validation,
+                execution_result={
+                    **execution_result,
+                    "outcome": outcome_result,
+                },
+            )
+
+            return {
+                **execution_result,
+                "outcome_id": outcome_result.get(
+                    "outcome_id"
+                ),
+                "recovery_status": outcome_result.get(
+                    "recovery_status"
+                ),
+            }
+
+        # ====================================================
+        # UNSUPPORTED ACTION
+        # ====================================================
 
         case.execution_status = "BLOCKED"
 
@@ -374,22 +421,25 @@ def execute_recovery_action(
             "escalated": False,
             "action": final_action,
             "reason": "UNSUPPORTED_ACTION",
+            "status": "FAILED",
+            "recovered_amount": 0,
         }
+
+        record_audit_event(
+            db,
+            case,
+            event_type="RECOVERY_EXECUTION",
+            event_source="ACTION_EXECUTOR",
+            decision=final_action,
+            reasoning="Unsupported recovery action.",
+            guardrail_result=validation,
+            execution_result=execution_result,
+        )
 
         return execution_result
 
     finally:
 
-        # ========================================================
-        # RECORD RECOVERY LATENCY
-        #
-        # This executes for EVERY execution path:
-        # BLOCKED / ESCALATED / SKIPPED / STOP / RETRY
-        # ========================================================
-
-        elapsed = (
-            time.perf_counter()
-            - start_time
-        )
+        elapsed = time.perf_counter() - start_time
 
         recovery_latency.observe(elapsed)
