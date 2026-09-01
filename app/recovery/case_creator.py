@@ -64,13 +64,24 @@ def create_recovery_case(
             "routing"
         ],
 
-        recommended_action=
-            recommend_action(
-                classification["classification"],
-                detection["failure_reason"]
-            ),
+        recommended_action=recommend_action(
+            classification["classification"],
+            detection["failure_reason"]
+        ),
 
-        status="OPEN"
+        intelligence_status="PENDING",
+
+        customer_consent=True,
+
+        recovered=False,
+
+        execution_status="PENDING",
+
+        retry_count=0,
+
+        max_retries=3,
+
+        recovery_status="AT_RISK"
     )
 
     db.add(case)
@@ -94,11 +105,9 @@ def recommend_action(
         return "CUSTOMER_REVIEW"
 
     if classification == "SOFT_FAILURE":
-
         return "RETRY_CHECKOUT"
 
     if classification == "SYSTEM_FAILURE":
-
         return "RETRY_WITH_ALTERNATE_ROUTE"
 
     return "AI_REVIEW"
