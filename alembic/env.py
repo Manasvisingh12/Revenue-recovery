@@ -1,3 +1,4 @@
+import os
 from logging.config import fileConfig
 
 from sqlalchemy import engine_from_config
@@ -44,8 +45,15 @@ def run_migrations_offline() -> None:
 def run_migrations_online() -> None:
     """Run migrations in online mode."""
 
+    database_url = os.getenv("DATABASE_URL")
+
+    if not database_url:
+        raise RuntimeError("DATABASE_URL environment variable is not set")
+
     connectable = engine_from_config(
-        config.get_section(config.config_ini_section),
+        {
+            "sqlalchemy.url": database_url
+        },
         prefix="sqlalchemy.",
         poolclass=pool.NullPool,
     )
