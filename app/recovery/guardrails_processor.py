@@ -84,8 +84,7 @@ def process_recovery_actions(
 
         result = execute_recovery_action(
             db,
-            case,
-            action
+            case
         )
 
         # ====================================================
