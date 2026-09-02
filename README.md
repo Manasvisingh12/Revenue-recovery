@@ -3,6 +3,8 @@
 ## AI-Powered Revenue Recovery & Autonomous Revenue Reliability Platform
 
 > **Find revenue that is slipping away. Decide what to do. Recover it safely. Verify the outcome.**
+> <img width="1536" height="1024" alt="image" src="https://github.com/user-attachments/assets/feb1ec65-6199-43dd-bf82-a20677288188" />
+
 
 Revenue Reliability is an AI-driven revenue recovery platform that treats **failed payments and abandoned checkouts as revenue reliability incidents**.
 
