@@ -1,67 +1,53 @@
-# Revenue Reliability
+# Revenue Reliability — AI Revenue Recovery Platform
 
-## AI-Powered Revenue Recovery & Autonomous Revenue Reliability Platform
+### A guardrailed, semi-autonomous system for finding, prioritizing, and recovering at-risk payment revenue
 
-> **Find revenue that is slipping away. Decide what to do. Recover it safely. Verify the outcome.**
-> <img width="1536" height="1024" alt="image" src="https://github.com/user-attachments/assets/feb1ec65-6199-43dd-bf82-a20677288188" />
+<img width="1536" height="1024" alt="Revenue Reliability banner" src="https://github.com/user-attachments/assets/feb1ec65-6199-43dd-bf82-a20677288188" />
 
+Revenue Reliability treats failed payments and abandoned checkouts as **revenue reliability incidents** rather than isolated transaction errors. For each incident, the platform works out how much revenue is at risk, why it happened, whether it's recoverable, which intervention to try, whether that intervention is safe to run, and whether it actually recovered the money.
 
-Revenue Reliability is an AI-driven revenue recovery platform that treats **failed payments and abandoned checkouts as revenue reliability incidents**.
-
-Instead of simply reporting that a payment failed, the platform determines **how much revenue is at risk, why the incident occurred, whether recovery is possible, which intervention should be used, whether that intervention is safe to execute, and whether revenue was actually recovered.**
-
-The result is a **Revenue Command Center** that connects AI decision-making, autonomous recovery, reliability engineering, observability, and financial impact in one system.
+All of that surfaces in a single Streamlit dashboard — the Revenue Command Center — alongside the AI's reasoning, the guardrails that gated each action, and the resulting observability metrics.
 
 ---
 
 ## Live Demo
 
-| Resource              | Link                                                           |
-| --------------------- | -------------------------------------------------------------- |
-| **Live Application**  | https://revenue-recovery-8akyl9o9ea3pykmaq7nhg9.streamlit.app/ |
-| **FastAPI Backend**   | https://revenue-recovery-apii.onrender.com                     |
-| **API Health Check**  | https://revenue-recovery-apii.onrender.com/health              |
-| **GitHub Repository** | https://github.com/Manasvisingh12/Revenue-recovery             |
+| Resource | Link |
+|---|---|
+| **Live Application** | https://revenue-recovery-8akyl9o9ea3pykmaq7nhg9.streamlit.app/ |
+| **FastAPI Backend** | https://revenue-recovery-apii.onrender.com |
+| **API Health Check** | https://revenue-recovery-apii.onrender.com/health |
+| **GitHub Repository** | https://github.com/Manasvisingh12/Revenue-recovery |
 
-**Primary judge-facing URL:**
-https://revenue-recovery-8akyl9o9ea3pykmaq7nhg9.streamlit.app/
+**Primary judge-facing URL:** https://revenue-recovery-8akyl9o9ea3pykmaq7nhg9.streamlit.app/
 
-The Streamlit application is the primary interface for the project. The FastAPI backend and PostgreSQL database are deployed independently in the cloud, so the public application does not depend on the developer's local machine.
-<img width="2940" height="1638" alt="image" src="https://github.com/user-attachments/assets/b86f0ba5-e3a2-4dcc-8fa9-f2e954e349a0" />
-<img width="2940" height="1638" alt="image" src="https://github.com/user-attachments/assets/170fdffa-04ad-4861-8fb0-3743c2c7cd0f" />
-<img width="2940" height="1638" alt="image" src="https://github.com/user-attachments/assets/07bc5087-b64a-4b97-91fa-c64df3bc5108" />
+The Streamlit app is the primary interface. The FastAPI backend and PostgreSQL database are deployed independently in the cloud (Render), so the public app doesn't depend on the developer's local machine.
 
+Additional views of the Revenue Command Center:
 
-
----
-
-# The Problem
-
-Payment failures and checkout abandonment are usually treated as isolated transaction errors.
-
-At scale, however, they become a **revenue reliability problem**.
-
-A merchant needs to know:
-
-1. **Which revenue is currently at risk?**
-2. **Which incidents are actually recoverable?**
-3. **What intervention should be attempted?**
-4. **Is the intervention safe to execute?**
-5. **Did the intervention actually recover revenue?**
-
-Traditional monitoring can tell engineering teams that a payment gateway or API is experiencing failures.
-
-It does not necessarily answer:
-
-> **"How much money is being lost, what should we do about it, and did our intervention work?"**
-
-Revenue Reliability is designed to close that gap.
+<img width="2940" height="1638" alt="Revenue Command Center screenshot" src="https://github.com/user-attachments/assets/b86f0ba5-e3a2-4dcc-8fa9-f2e954e349a0" />
+<img width="2940" height="1638" alt="Revenue Command Center screenshot" src="https://github.com/user-attachments/assets/170fdffa-04ad-4861-8fb0-3743c2c7cd0f" />
+<img width="2940" height="1638" alt="Revenue Command Center screenshot" src="https://github.com/user-attachments/assets/07bc5087-b64a-4b97-91fa-c64df3bc5108" />
 
 ---
 
-# The Solution
+## The Problem
 
-Revenue Reliability converts revenue incidents into structured recovery cases and moves them through an automated recovery pipeline.
+Payment failures and checkout abandonment are usually handled as isolated transaction errors. At scale, they add up to a revenue reliability problem — a merchant needs to know:
+
+1. Which revenue is currently at risk?
+2. Which incidents are actually recoverable?
+3. What intervention should be attempted?
+4. Is that intervention safe to execute?
+5. Did it actually recover the revenue?
+
+Standard monitoring can tell an engineering team that a payment gateway or API is failing. It doesn't answer *how much money is being lost, what to do about it, and whether the fix worked* — that's the gap this project is aimed at.
+
+---
+
+## The Solution
+
+Revenue Reliability turns revenue incidents into structured recovery cases and moves them through an automated pipeline:
 
 ```text
 Payment / Checkout Event
@@ -88,177 +74,91 @@ Payment / Checkout Event
  Revenue + Reliability Metrics
 ```
 
-The system follows a principle of **bounded autonomy**.
-
-AI can recommend and execute recovery actions, but execution is controlled by explicit safety mechanisms including:
-
-* Retry limits
-* Recovery budgets
-* Customer consent checks
-* Contact limits
-* Duplicate recovery protection
-* Circuit breaker controls
-* Human escalation
-* Audit logging
+AI can recommend and execute recovery actions, but only within explicit safety limits — retry limits, recovery budgets, customer consent checks, contact limits, duplicate-recovery protection, a circuit breaker, human escalation, and audit logging. The full guardrail layer is covered in [Guardrails & Safety Controls](#guardrails--safety-controls).
 
 ---
 
-# Revenue Command Center
+## Revenue Command Center — Demo Metrics
 
-The Revenue Command Center provides an operational view of revenue exposure, AI decisions, recovery performance, and system reliability.
+| Metric | Current Value | Meaning |
+|---|---:|---|
+| **Revenue at Risk** | **₹13,02,585** | Revenue currently exposed across detected recovery cases |
+| **Recovered Revenue** | **₹18,990** | Revenue recovered through simulated recovery execution |
+| **Recovery Success** | **100%** | Successful recovery attempts / recorded outcomes |
+| **Recovery Attempts** | **10** | Recovery attempts that produced a recorded outcome |
+| **Successful Outcomes** | **10** | Attempts that successfully recovered revenue |
+| **Failed Outcomes** | **0** | Recorded outcomes that failed |
+| **Circuit Breaker** | **CLOSED** | Recovery execution is currently permitted |
 
-## Current Demo Metrics
-
-| Metric                  |  Current Value | Meaning                                                     |
-| ----------------------- | -------------: | ----------------------------------------------------------- |
-| **Revenue at Risk**     | **₹13,02,585** | Revenue currently exposed across detected recovery cases    |
-| **Recovered Revenue**   |    **₹18,990** | Revenue successfully recovered through simulated recovery   |
-| **Recovery Success**    |       **100%** | Successful recovery attempts / successful recorded outcomes |
-| **Recovery Attempts**   |         **10** | Recovery attempts that produced recorded outcomes           |
-| **Successful Outcomes** |         **10** | Recovery attempts that successfully recovered revenue       |
-| **Failed Outcomes**     |          **0** | Recorded recovery outcomes that failed                      |
-| **Circuit Breaker**     |     **CLOSED** | Recovery execution is currently permitted                   |
-
-> **Note:** This is a controlled simulation environment. Recovery amounts represent simulated recovery execution and do not involve real customer payments.
+*These numbers come from a controlled simulation — no real customer payments are involved, and the sample size is small. See [Limitations](#limitations) before reading too much into the 100% figure.*
 
 ---
 
-# AI Recovery Intelligence
+## AI Recovery Intelligence
 
-The intelligence layer does not apply the same action to every revenue incident.
+Each recovery case is scored using signals including failure classification, a recovery opportunity score, recovery probability, expected recovery value, AI confidence, incident context, customer/transaction information, and the safety constraints in play. Based on those signals, the case is routed to an intervention:
 
-Each recovery case is evaluated using signals including:
+| Recommended Action | Cases | Purpose |
+|---|---:|---|
+| **MESSAGE** | **121** | Contact the customer through a recovery/payment-link flow |
+| **WAIT** | **60** | Delay intervention when immediate action isn't optimal |
+| **NO_ACTION** | **24** | Avoid unnecessary intervention |
+| **RETRY** | **10** | Attempt automated payment recovery |
+| **ESCALATE** | **10** | Route review-required cases to a human |
+| **STOP** | **0** | Explicitly block recovery execution |
+| **Total** | **225** | Total recovery cases evaluated |
 
-* Failure classification
-* Recovery opportunity score
-* Recovery probability
-* Expected recovery value
-* AI confidence
-* Incident context
-* Customer and transaction information
-* Safety constraints
+The spread across actions shows the system routing cases differently rather than retrying every failure the same way.
 
-The system then routes the case toward an appropriate intervention.
+### Recovery Case Example
 
-## Current AI Decision Distribution
-
-| Recommended Action |   Cases | Purpose                                                   |
-| ------------------ | ------: | --------------------------------------------------------- |
-| **MESSAGE**        | **121** | Contact the customer through a recovery/payment-link flow |
-| **WAIT**           |  **60** | Delay intervention when immediate action is not optimal   |
-| **NO_ACTION**      |  **24** | Avoid unnecessary intervention                            |
-| **RETRY**          |  **10** | Attempt automated payment recovery                        |
-| **ESCALATE**       |  **10** | Route review-required cases to a human                    |
-| **STOP**           |   **0** | Explicitly prevent recovery execution                     |
-| **Total**          | **225** | Total recovery cases evaluated                            |
-
-This distribution demonstrates that the system is **making differentiated recovery decisions rather than blindly retrying failed transactions**.
-
----
-
-# Recovery Intelligence Example
-
-Each recovery case contains a detailed intelligence profile.
-
-### Example Case
-
-```text
-Case ID
-case_641693148d7d
-
-Amount
-₹1,999
-
-Status
-AT_RISK
-
-Classification
-SOFT_FAILURE
-
-AI Decision
-MESSAGE
-
-Recovery Score
-60.00
-
-Expected Recovery Value
-₹1,599
-
-AI Confidence
-88%
-
-Recovery Probability
-80%
+```json
+{
+  "case_id": "case_641693148d7d",
+  "amount_inr": 1999,
+  "status": "AT_RISK",
+  "classification": "SOFT_FAILURE",
+  "ai_decision": "MESSAGE",
+  "recovery_score": 60.0,
+  "expected_recovery_value_inr": 1599,
+  "ai_confidence_pct": 88,
+  "recovery_probability_pct": 80
+}
 ```
 
-The investigation interface also exposes:
-
-* AI diagnosis
-* Decision reasoning
-* Incident classification
-* Recommended intervention
-* Recovery probability
-* Expected recovery value
-* Execution state
-* Recovery outcome
-
-This allows an operator to understand **why a decision was made**, rather than treating the AI as a black box.
+The investigation view also exposes the AI's diagnosis, decision reasoning, incident classification, recommended intervention, execution state, and recovery outcome — so an operator can see *why* a decision was made rather than just what it was.
 
 ---
 
-# End-to-End Revenue Recovery Pipeline
+## End-to-End Pipeline
 
-| Stage                  | Component             | Responsibility                              |
-| ---------------------- | --------------------- | ------------------------------------------- |
-| **01 — Events**        | Event Simulation      | Generate payment and checkout activity      |
-| **02 — Detection**     | Detection Engine      | Detect failures, abandonment, and incidents |
-| **03 — AI Decision**   | Recovery Intelligence | Classify risk and recommend intervention    |
-| **04 — Guardrails**    | Guardrail Engine      | Validate whether the action is safe         |
-| **05 — Execution**     | Recovery Executor     | Execute the permitted recovery workflow     |
-| **06 — Outcome**       | Outcome Tracker       | Verify and persist recovery results         |
-| **07 — Observability** | Prometheus / Grafana  | Monitor system and recovery behavior        |
-| **08 — Audit**         | Audit Trail           | Preserve decision and execution history     |
-
-The complete lifecycle is:
-
-```text
-DETECT
-   ↓
-UNDERSTAND
-   ↓
-DECIDE
-   ↓
-PROTECT
-   ↓
-EXECUTE
-   ↓
-VERIFY
-   ↓
-OBSERVE
-```
+| Stage | Component | Responsibility |
+|---|---|---|
+| **01 — Events** | Event Simulation | Generate payment and checkout activity |
+| **02 — Detection** | Detection Engine | Detect failures, abandonment, and incidents |
+| **03 — AI Decision** | Recovery Intelligence | Classify risk and recommend an intervention |
+| **04 — Guardrails** | Guardrail Engine | Validate whether the action is safe |
+| **05 — Execution** | Recovery Executor | Execute the permitted recovery workflow |
+| **06 — Outcome** | Outcome Tracker | Verify and persist the recovery result |
+| **07 — Observability** | Prometheus / Grafana | Monitor system and recovery behavior |
+| **08 — Audit** | Audit Trail | Preserve decision and execution history |
 
 ---
 
-# Guardrails & Revenue Reliability
+## Guardrails & Safety Controls
 
-The core idea behind the project is:
+A core design constraint: AI can recommend a recovery action, but it never executes one without passing through the guardrail layer below.
 
-> **AI should never have unrestricted access to execute financial recovery actions.**
-
-Every proposed intervention passes through a guardrail layer.
-
-## Safety Controls
-
-| Guardrail                   | Purpose                                                            |
-| --------------------------- | ------------------------------------------------------------------ |
-| **Circuit Breaker**         | Stops recovery execution when system safety conditions deteriorate |
-| **Retry Limits**            | Prevents excessive repeated payment attempts                       |
-| **Recovery Budget**         | Limits recovery execution exposure                                 |
-| **Contact Limits**          | Prevents excessive customer contact                                |
-| **Consent Check**           | Ensures customer consent requirements are respected                |
-| **Already Recovered Check** | Prevents duplicate recovery attempts                               |
-| **Human Escalation**        | Routes sensitive cases for manual review                           |
-| **Audit Trail**             | Records AI decisions, guardrail evaluations, and execution events  |
+| Guardrail | Purpose |
+|---|---|
+| **Circuit Breaker** | Stops recovery execution when system safety conditions deteriorate |
+| **Retry Limits** | Prevents excessive repeated payment attempts |
+| **Recovery Budget** | Caps recovery execution exposure |
+| **Contact Limits** | Prevents excessive customer contact |
+| **Consent Check** | Enforces customer consent requirements |
+| **Already-Recovered Check** | Prevents duplicate recovery attempts |
+| **Human Escalation** | Routes sensitive cases for manual review |
+| **Audit Trail** | Records AI decisions, guardrail evaluations, and execution events |
 
 ### Bounded Autonomy
 
@@ -275,15 +175,13 @@ Every proposed intervention passes through a guardrail layer.
          Execute     Stop     Human Review
 ```
 
-This separation between **decision** and **permission to execute** is one of the central reliability principles of the system.
+This split between *deciding* and *being allowed to act* is what keeps the AI from having direct, unchecked control over financial recovery actions.
 
 ---
 
-# Recovery Execution
+## Recovery Execution
 
-The current demo implements controlled recovery execution.
-
-For permitted `RETRY` cases:
+For a permitted `RETRY` case:
 
 ```text
 Recovery Case
@@ -301,28 +199,14 @@ Simulated Payment Recovery
 RecoveryOutcome Created
      |
      v
-Case → RECOVERED
+Case -> RECOVERED
 ```
 
-The system then records:
-
-* Recovery action
-* Recovery status
-* Recovered amount
-* Case state
-* Execution result
-* Completion timestamp
-* Audit information
-
-A recovery is therefore not considered successful simply because an action was triggered.
-
-**Success requires a recorded recovery outcome.**
+The system records the recovery action, status, recovered amount, case state, execution result, completion timestamp, and audit information. A recovery isn't counted as successful just because an action was triggered — it needs a recorded `RecoveryOutcome`.
 
 ---
 
-# Observability
-
-Revenue Reliability includes an observability layer designed around both **engineering reliability and financial impact**.
+## Observability
 
 ```text
                     FastAPI
@@ -334,20 +218,11 @@ Revenue Reliability includes an observability layer designed around both **engin
                     Grafana
 ```
 
-Prometheus-compatible metrics are exposed by the FastAPI service for monitoring:
-
-* Recovery latency
-* Recovery execution
-* Guardrail events
-* AI decisions
-* Recovery outcomes
-* System behavior
-
-Grafana provides the operational monitoring layer, while the Streamlit Revenue Command Center surfaces the most important business-facing metrics.
+FastAPI exposes Prometheus-compatible metrics covering recovery latency, recovery execution, guardrail events, AI decisions, recovery outcomes, and general system behavior. Grafana handles operational monitoring; the Streamlit Command Center surfaces the business-facing numbers.
 
 ---
 
-# Architecture
+## Architecture
 
 ```mermaid
 flowchart TB
@@ -396,9 +271,7 @@ flowchart TB
 
 ---
 
-# Production Deployment Architecture
-
-The public application is deployed using separate cloud services.
+## Production Deployment Architecture
 
 ```mermaid
 flowchart LR
@@ -416,85 +289,57 @@ flowchart LR
     R --> PG
 ```
 
-### Deployment Responsibilities
+| Service | Responsibility |
+|---|---|
+| **Streamlit Community Cloud** | Public Revenue Command Center |
+| **Render** | FastAPI backend |
+| **Render PostgreSQL** | Persistent production database |
+| **Prometheus** | Metrics and observability |
+| **Grafana** | Operational monitoring |
+| **Docker Compose** | Local development environment |
 
-| Service                       | Responsibility                 |
-| ----------------------------- | ------------------------------ |
-| **Streamlit Community Cloud** | Public Revenue Command Center  |
-| **Render**                    | FastAPI backend                |
-| **Render PostgreSQL**         | Persistent production database |
-| **Prometheus**                | Metrics and observability      |
-| **Grafana**                   | Operational monitoring         |
-| **Docker Compose**            | Local development environment  |
-
-The public application does not require:
-
-* VS Code
-* Docker Desktop
-* A locally running FastAPI server
-* A locally running PostgreSQL database
-
-The deployed Streamlit application communicates with the deployed FastAPI service.
+The public app doesn't require VS Code, Docker Desktop, or a locally running FastAPI/PostgreSQL instance — the deployed Streamlit app talks to the deployed FastAPI service directly.
 
 ---
 
-# Technology Stack
+## Technology Stack
 
-| Layer                | Technology                | Role                                           |
-| -------------------- | ------------------------- | ---------------------------------------------- |
-| **Frontend**         | Streamlit                 | Revenue Command Center and investigation UI    |
-| **Backend**          | FastAPI                   | REST API and orchestration                     |
-| **Database**         | PostgreSQL                | Persistent revenue and recovery data           |
-| **ORM**              | SQLAlchemy                | Database models and access                     |
-| **Migrations**       | Alembic                   | Database schema versioning                     |
-| **AI / Decisioning** | Python                    | Classification, scoring and recovery decisions |
-| **Reliability**      | Guardrail Engine          | Safe autonomous execution                      |
-| **Metrics**          | Prometheus                | Application observability                      |
-| **Dashboards**       | Grafana                   | Operational monitoring                         |
-| **Containers**       | Docker / Docker Compose   | Reproducible local environment                 |
-| **Deployment**       | Render                    | Backend and database hosting                   |
-| **Frontend Hosting** | Streamlit Community Cloud | Public application                             |
-
----
-
-# Demo Dataset
-
-The project uses a controlled simulator to reproduce realistic revenue-risk scenarios without processing real customer transactions.
-
-## Dataset Overview
-
-| Dataset                          |     Records | Description                                            |
-| -------------------------------- | ----------: | ------------------------------------------------------ |
-| **Payment Events**               |     **520** | Simulated payment attempts                             |
-| **Checkout Sessions**            |     **200** | Simulated completed and abandoned sessions             |
-| **Recovery Cases**               |     **225** | Revenue-risk cases generated by the detection pipeline |
-| **Successful Recovery Outcomes** |      **10** | Simulated successful RETRY recoveries                  |
-| **Recovered Revenue**            | **₹18,990** | Total simulated recovered value                        |
-
-### Simulated Failure Conditions
-
-The simulator includes scenarios such as:
-
-* Insufficient funds
-* Card expiry
-* Gateway timeout
-* Bank timeout
-* Temporary authorization failures
-* Unknown errors
-* Duplicate events
-* Checkout abandonment
-
-This allows the recovery engine to be evaluated against different incident types rather than a single failure condition.
+| Layer | Technology | Role |
+|---|---|---|
+| **Frontend** | Streamlit | Revenue Command Center and investigation UI |
+| **Backend** | FastAPI | REST API and orchestration |
+| **Database** | PostgreSQL | Persistent revenue and recovery data |
+| **ORM** | SQLAlchemy | Database models and access |
+| **Migrations** | Alembic | Database schema versioning |
+| **AI / Decisioning** | Python | Classification, scoring, and recovery decisions |
+| **Reliability** | Guardrail Engine | Safety controls on execution |
+| **Metrics** | Prometheus | Application observability |
+| **Dashboards** | Grafana | Operational monitoring |
+| **Containers** | Docker / Docker Compose | Reproducible local environment |
+| **Deployment** | Render | Backend and database hosting |
+| **Frontend Hosting** | Streamlit Community Cloud | Public application |
 
 ---
 
-# Failure Engineering
+## Demo Dataset
 
-A recovery system should not only work under normal conditions.
+A controlled simulator reproduces realistic revenue-risk scenarios without touching real customer transactions.
 
-It should also demonstrate how it behaves when dependencies fail.
+| Dataset | Records | Description |
+|---|---:|---|
+| **Payment Events** | **520** | Simulated payment attempts |
+| **Checkout Sessions** | **200** | Simulated completed and abandoned sessions |
+| **Recovery Cases** | **225** | Revenue-risk cases from the detection pipeline |
+| **Successful Recovery Outcomes** | **10** | Simulated successful `RETRY` recoveries |
+| **Recovered Revenue** | **₹18,990** | Total simulated recovered value |
 
-The project includes controlled failure injection and reset mechanisms for demonstration and reliability testing.
+Simulated failure conditions include insufficient funds, card expiry, gateway timeout, bank timeout, temporary authorization failures, unknown errors, duplicate events, and checkout abandonment — so the recovery engine is exercised against more than one failure type.
+
+---
+
+## Failure Engineering
+
+The project includes controlled failure injection and reset mechanisms, so it can show how the system behaves when its own dependencies fail, not just under normal conditions:
 
 ```text
 Normal System
@@ -515,80 +360,46 @@ Recovery or Escalation
 Reset Environment
 ```
 
-This allows the project to demonstrate the connection between **technical reliability and financial impact**.
-
 ---
 
-# Auditability
+## Auditability
 
-Every important stage of the recovery lifecycle is designed to be traceable.
-
-The audit layer records events such as:
-
-* AI decision
-* Guardrail evaluation
-* Recovery execution
-* Execution result
-* Recovery outcome
-* Postmortem metadata
-
-This provides an investigation trail for understanding:
+The audit layer records the AI decision, guardrail evaluation, recovery execution, execution result, recovery outcome, and postmortem metadata for each case, so an investigation can trace:
 
 ```text
 What happened?
-     ↓
+     |
 Why did it happen?
-     ↓
+     |
 What did the AI recommend?
-     ↓
+     |
 Was the action allowed?
-     ↓
+     |
 What was executed?
-     ↓
+     |
 Did revenue recover?
 ```
 
 ---
 
-# Project Structure
+## Project Structure
 
 ```text
 Revenue-recovery/
 │
 ├── app/
-│   ├── api/
-│   │   └── API endpoints
-│   │
-│   ├── classification/
-│   │   └── Failure classification
-│   │
-│   ├── detection/
-│   │   └── Revenue incident detection
-│   │
-│   ├── failure_engineering/
-│   │   └── Controlled failure injection
-│   │
-│   ├── pipeline/
-│   │   └── End-to-end processing
-│   │
+│   ├── api/                      # API endpoints
+│   ├── classification/           # Failure classification
+│   ├── detection/                # Revenue incident detection
+│   ├── failure_engineering/      # Controlled failure injection
+│   ├── pipeline/                 # End-to-end processing
 │   └── recovery/
-│       ├── guardrails/
-│       │   └── Safety controls
-│       │
-│       ├── action_executor.py
-│       │   └── Recovery execution
-│       │
-│       ├── ai_diagnosis.py
-│       │   └── AI diagnosis
-│       │
-│       ├── decision_engine.py
-│       │   └── Recovery decisioning
-│       │
-│       ├── outcome_tracker.py
-│       │   └── Recovery outcome persistence
-│       │
-│       └── recovery_metrics.py
-│           └── Recovery observability
+│       ├── guardrails/           # Safety controls
+│       ├── action_executor.py    # Recovery execution
+│       ├── ai_diagnosis.py       # AI diagnosis
+│       ├── decision_engine.py    # Recovery decisioning
+│       ├── outcome_tracker.py    # Recovery outcome persistence
+│       └── recovery_metrics.py   # Recovery observability
 │
 ├── simulation/
 │   ├── generator.py
@@ -617,385 +428,166 @@ Revenue-recovery/
 
 ---
 
-# Local Development
+## Local Development
 
-## 1. Clone the repository
+### 1. Clone the repository
 
 ```bash
 git clone https://github.com/Manasvisingh12/Revenue-recovery.git
-
 cd Revenue-recovery
 ```
 
-## 2. Start the backend stack
+### 2. Start the backend stack
 
 ```bash
 docker compose up --build
 ```
 
-This starts the local services defined by the project.
-
-## 3. Run database migrations
+### 3. Run database migrations
 
 ```bash
 alembic upgrade head
 ```
 
-## 4. Load demo data
+### 4. Load demo data
 
 ```bash
 python -m simulation.load_data
 ```
 
-## 5. Run the API locally
+### 5. Run the API locally
 
 ```bash
 uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
-FastAPI documentation:
+FastAPI docs: `http://localhost:8000/docs`
 
-```text
-http://localhost:8000/docs
-```
-
-## 6. Run Streamlit locally
+### 6. Run Streamlit locally
 
 ```bash
 pip install -r streamlit/requirements.txt
-
 streamlit run streamlit/app.py
 ```
 
-For local development:
-
-```text
-API_BASE_URL=http://localhost:8000
-```
+For local development: `API_BASE_URL=http://localhost:8000`
 
 ### Security
 
-Do not commit:
-
-* Database passwords
-* API keys
-* Cloud credentials
-* Environment secrets
-
-Use environment variables or platform secret managers.
+Don't commit database passwords, API keys, cloud credentials, or other environment secrets — use environment variables or a platform secret manager.
 
 ---
 
-# Hackathon Demo Flow
+## Demo Walkthrough
 
-The project is designed to be explained through a short operational story.
+### 1. Start at the Command Center
+Show revenue at risk, recovered revenue, recovery success rate, circuit breaker status, and the AI decision distribution — establish the financial impact first.
 
-## 01 — Start at the Command Center
+### 2. Open a Recovery Case
+Walk through incident classification, recovery score, recovery probability, expected recovery value, AI confidence, diagnosis, and decision reasoning — this shows the system isn't just displaying transaction data.
 
-Show:
+### 3. Explain the Guardrails
+Show that an AI recommendation doesn't automatically become an execution — it passes through guardrail validation and comes out allowed, blocked, or escalated. This is the platform's core safety mechanism.
 
-* Revenue at Risk
-* Recovered Revenue
-* Recovery Success
-* Circuit Breaker
-* AI decision distribution
+### 4. Demonstrate Recovery
+Use a permitted `RETRY` case and walk it from `AT_RISK` → `RETRY` → `SUCCESS` → `RECOVERED`, then show the recovered amount land in the Command Center.
 
-The objective is to establish the financial impact immediately.
-
----
-
-## 02 — Open a Recovery Case
-
-Select a case and explain:
-
-* Incident classification
-* Recovery score
-* Recovery probability
-* Expected recovery value
-* AI confidence
-* AI diagnosis
-* Decision reasoning
-
-This demonstrates that the system is not simply displaying transaction data.
+### 5. Close with Observability
+Show how Prometheus, Grafana, audit logs, recovery outcomes, and financial metrics connect technical reliability back to revenue impact.
 
 ---
 
-## 03 — Explain the Guardrails
+## What Broke and How We Fixed It
 
-Show that an AI recommendation does not automatically become an execution.
+Building this surfaced a few real engineering failures, which became part of the project's own reliability story.
 
-The action passes through:
+### Database migration failure
+The initial migration chain didn't create the `recovery_cases` table before later migrations tried to modify it, which broke database initialization on deploy.
+**Fix:** consolidated the migration history into a clean baseline schema migration and verified the database against the correct Alembic head.
 
-```text
-AI Decision
-     ↓
-Guardrail Validation
-     ↓
-Allowed / Blocked / Escalated
-```
+### Recovery execution contract mismatch
+The guardrail processor originally called the recovery executor with an incompatible function signature.
+**Fix:** aligned the contract so the guardrail processor passes the database session and recovery case the executor actually expects.
 
-This is the key safety component of the platform.
+### Recovery outcomes weren't being persisted
+The recovery execution path could successfully run a `RETRY` without reliably creating a `RecoveryOutcome` record — so a case could show as executed while the financial observability layer still showed zero recovered revenue.
+**Fix:** wired the outcome tracker into the successful `RETRY` path, so every completed attempt now produces `Recovery Attempt → RecoveryOutcome → Recovered Amount → Case: RECOVERED → Observability Metrics`.
 
----
-
-## 04 — Demonstrate Recovery
-
-Use a permitted `RETRY` case.
-
-Show:
-
-```text
-AT_RISK
-   ↓
-RETRY
-   ↓
-SUCCESS
-   ↓
-RECOVERED
-```
-
-Then show the resulting recovered amount in the Command Center.
+The underlying lesson: a recovery *action* is not the same thing as a recovery *outcome* — the system only counts the latter.
 
 ---
 
-## 05 — Close With Observability
+## Design Principles
 
-Explain how:
-
-* Prometheus
-* Grafana
-* Audit logs
-* Recovery outcomes
-* Financial metrics
-
-connect technical system reliability with revenue impact.
+1. **Revenue as a reliability signal.** Traditional SRE metrics (uptime, latency, error rate) don't say how much financial value an incident cost — this project ties technical incidents to a revenue number.
+2. **Bounded autonomy.** The AI can decide; it can't execute without passing through the guardrail layer.
+3. **Outcome-driven recovery.** A recovery attempt only counts as successful once the outcome is verified and recorded.
+4. **Explainability.** An operator can see why a case was classified a certain way, why an action was recommended, how confident the system was, and why an action was allowed or blocked.
+5. **Observability by design.** Financial and engineering metrics are captured as part of the recovery workflow itself, not bolted on afterward.
 
 ---
 
-# What Broke and How We Recovered
+## Limitations
 
-Building the system exposed several real engineering failure modes.
+This is a hackathon build running against a controlled simulation, not live payment traffic. Worth being explicit about what that means in practice:
 
-These failures became part of the project's reliability story.
+- No real payment gateway is integrated — the 520 payment events and 200 checkout sessions all come from the built-in simulator, not a live processor.
+- The 100% recovery success rate is measured over 10 completed `RETRY` outcomes out of 225 total cases — a small sample from simulated data, not a statistically meaningful real-world recovery rate.
+- The AI Recovery Intelligence layer is a rule/scoring-based decision engine, not a model trained on historical recovery outcomes — there's no feedback loop yet from past recoveries into future decisions.
+- The `MESSAGE` action isn't wired to a real notification channel (SMS/email/WhatsApp) — it's a simulated intervention path.
+- There's no multi-tenant auth: the deployed app doesn't separate data by merchant or restrict access, so it isn't ready to onboard a real merchant as-is.
+- Failure injection and reliability testing are manually/demo-triggered rather than run as continuous chaos testing.
+- Hosting is on Streamlit Community Cloud and Render — if those are on free-tier plans, expect cold starts and rate limits during a live demo.
 
-## Database Migration Failure
-
-The initial migration chain did not create the `recovery_cases` table before later migrations attempted to modify it.
-
-This caused deployment failure during database initialization.
-
-### Resolution
-
-The migration history was consolidated into a clean baseline schema migration.
-
-The database was then migrated to the correct Alembic head and the required tables were verified.
+*(Update this list as the real gaps close — it reflects the project as described here, not a live audit of the current repo.)*
 
 ---
 
-## Recovery Execution Contract Mismatch
+## Future Work
 
-The guardrail processor originally called the recovery executor using an incompatible function signature.
-
-### Resolution
-
-The execution contract was aligned so that the guardrail processor passes the database session and recovery case expected by the executor.
-
----
-
-## Recovery Outcomes Were Not Being Persisted
-
-The initial recovery execution path could successfully execute a recovery action without consistently creating a `RecoveryOutcome` record.
-
-This meant the case state could indicate execution while the financial observability layer still showed no recovered revenue.
-
-### Resolution
-
-The outcome tracker was integrated into successful RETRY execution.
-
-The system now records:
-
-```text
-Recovery Attempt
-      ↓
-RecoveryOutcome
-      ↓
-Recovered Amount
-      ↓
-Case → RECOVERED
-      ↓
-Observability Metrics
-```
-
-This is an important design principle:
-
-> **A recovery action is not the same thing as a recovery outcome.**
+- Live payment processor integrations
+- Real-time webhook ingestion
+- Historical ML models trained on recovery outcomes
+- Real customer notification channels
+- Merchant-specific recovery policies
+- Customer-level recovery propensity models
+- Real-time feature stores
+- Multi-tenant authentication and authorization
+- OpenTelemetry distributed tracing
+- Advanced canary and rollback controls
+- Recovery ROI analytics
+- Cohort-level recovery intelligence
+- Automated postmortem generation
 
 ---
 
-# Design Principles
+## Project Status
 
-## 1. Revenue as a Reliability Signal
+The current build demonstrates the full loop — detect, classify, decide, guard, execute, verify, observe — end to end, combining AI recovery intelligence, guardrailed execution, PostgreSQL persistence, a FastAPI backend, a Streamlit operations UI, Prometheus metrics, Grafana monitoring, audit trails, and controlled failure engineering.
 
-Traditional SRE systems focus on uptime, latency, errors, and availability.
-
-Revenue Reliability extends that thinking by asking:
-
-> **How much financial value is affected by a technical incident?**
+It's a hackathon-stage MVP: the core loop works and is demoable, but see [Limitations](#limitations) for what's still simulated or missing before this could handle real merchant traffic.
 
 ---
 
-## 2. Bounded Autonomy
+## Submission Summary
 
-AI should be capable of making decisions without being given unrestricted execution authority.
+**Track:** AI Revenue Recovery
+**Project:** Revenue Reliability — AI Revenue Recovery Command Center
 
-Every recovery action is validated through safety controls.
+**What it solves:** Failed payments and abandoned checkouts create revenue loss that standard monitoring doesn't connect directly to business impact.
 
----
+**What we built:** A guardrailed revenue recovery platform that detects revenue-risk events, classifies the incident, scores the recovery opportunity, picks an intervention, validates it through safety guardrails, executes permitted recovery actions, verifies the outcome, and surfaces the financial and reliability picture in a command center.
 
-## 3. Outcome-Driven Recovery
-
-A recovery attempt should only be considered successful when the system can verify the resulting recovery outcome.
-
----
-
-## 4. Explainability
-
-Operators should be able to understand:
-
-* Why the case was classified a certain way
-* Why an action was recommended
-* How confident the system was
-* What the expected recovery value was
-* Why an action was allowed or blocked
+**Primary demo:** https://revenue-recovery-8akyl9o9ea3pykmaq7nhg9.streamlit.app/
+**GitHub:** https://github.com/Manasvisingh12/Revenue-recovery
+**Backend:** https://revenue-recovery-apii.onrender.com
 
 ---
 
-## 5. Observability by Design
-
-Financial metrics and engineering metrics are captured as part of the recovery workflow rather than being treated as an afterthought.
-
----
-
-# Limitations
-
-This project is a hackathon implementation using a controlled simulation environment.
-
-The current system does not process real customer payments.
-
-Recovery actions are simulated to demonstrate the architecture and decision flow.
-
-The AI recovery intelligence is also designed as a demonstrable decision engine rather than a production-trained model using a large historical payment dataset.
-
-These choices keep the project safe, reproducible, and suitable for a hackathon environment.
-
----
-
-# Future Work
-
-A production implementation could extend the platform with:
-
-* Live payment processor integrations
-* Real-time webhook ingestion
-* Historical ML models trained on recovery outcomes
-* Real customer notification channels
-* Merchant-specific recovery policies
-* Customer-level recovery propensity models
-* Real-time feature stores
-* Multi-tenant authentication and authorization
-* OpenTelemetry distributed tracing
-* Advanced canary and rollback controls
-* Recovery ROI analytics
-* Cohort-level recovery intelligence
-* Automated postmortem generation
-
----
-
-# Project Status
-
-## Hackathon-Ready MVP
-
-The current implementation demonstrates the complete core loop:
-
-```text
-Detect
-  ↓
-Understand
-  ↓
-Decide
-  ↓
-Protect
-  ↓
-Execute
-  ↓
-Verify
-  ↓
-Observe
-```
-
-The platform combines:
-
-* AI recovery intelligence
-* Autonomous execution
-* Reliability guardrails
-* Revenue observability
-* PostgreSQL persistence
-* FastAPI APIs
-* Streamlit operations UI
-* Prometheus metrics
-* Grafana monitoring
-* Audit trails
-* Controlled failure engineering
-
----
-
-# Submission Summary
-
-### Track
-
-**Revenue Reliability / AI Revenue Recovery**
-
-### Project
-
-**Revenue Reliability — AI Revenue Recovery Command Center**
-
-### What It Solves
-
-Failed payments and abandoned checkouts create hidden revenue loss that traditional monitoring does not connect directly to business impact.
-
-### What We Built
-
-An autonomous, guardrailed revenue recovery platform that:
-
-1. Detects revenue-risk events
-2. Classifies the incident
-3. Calculates recovery opportunity
-4. Determines the appropriate intervention
-5. Validates the action through safety guardrails
-6. Executes permitted recovery actions
-7. Verifies recovery outcomes
-8. Exposes financial and reliability intelligence through a command center
-
-### Primary Demo
-
-https://revenue-recovery-8akyl9o9ea3pykmaq7nhg9.streamlit.app/
-
-### GitHub
-
-https://github.com/Manasvisingh12/Revenue-recovery
-
-### Backend
-
-https://revenue-recovery-apii.onrender.com
-
----
-
-# Author
+## Author
 
 **Manasvi Singh**
-
 B.Tech Computer Science & Engineering
-
 Cloud Engineering | DevOps | SRE | AI
 
-GitHub:
-https://github.com/Manasvisingh12
+GitHub: https://github.com/Manasvisingh12
